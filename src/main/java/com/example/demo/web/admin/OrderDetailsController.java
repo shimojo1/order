@@ -29,26 +29,24 @@ public class OrderDetailsController {
 	/*
 	 * 新規作成画面表示
 	 */
-	@GetMapping(value = "/create/{id}")
-	public String form(@PathVariable Integer id, OrderDetail orderDetail, Model model) {
+	@GetMapping(value = "/create/{orderId}")
+	public String form(@PathVariable Integer orderId, OrderDetail orderDetail, Model model) {
 		model.addAttribute("orderdetail", orderDetail);
-		model.addAttribute("id", id);
+		model.addAttribute("orderId", orderId);
 		return "admin/orderdetails/create";
 	}
 
 	/*
 	 * 新規登録
 	 */
-	@PostMapping(value = "/create/{id}")
-	public String register(@PathVariable Integer id, @Valid OrderDetail orderDetail, BindingResult result, Model model, RedirectAttributes ra) {
+	@PostMapping(value = "/create/{orderId}")
+	public String register(@PathVariable Integer orderId, @Valid OrderDetail orderDetail, BindingResult result, Model model, RedirectAttributes ra) {
 		FlashData flash;
 		try {
 			if (result.hasErrors()) {
-				model.addAttribute("orderdetail", orderDetail);
-				model.addAttribute("id", id);
 				return "admin/orderdetails/create";
 			}
-			orderDetail.setOrder(orderService.findById(id));
+			orderDetail.setOrder(orderService.findById(orderId));
 			// 新規登録
 			orderDetailService.save(orderDetail);
 			flash = new FlashData().success("新規作成しました");
@@ -56,6 +54,48 @@ public class OrderDetailsController {
 			flash = new FlashData().danger("処理中にエラーが発生しました");
 		}
 		ra.addFlashAttribute("flash", flash);
-		return "redirect:/admin/orders/view/" + id;
+		return "redirect:/admin/orders/view/" + orderId;
+	}
+	
+	/*
+	 * 編集画面表示
+	 */
+	@GetMapping(value = "/edit/{id}")
+	public String edit(@PathVariable Integer id, Model model, RedirectAttributes ra) {
+		try {
+			// 存在確認
+			OrderDetail orderDetail = orderDetailService.findById(id);
+			model.addAttribute("orderDetail", orderDetail);
+		} catch (Exception e) {
+			FlashData flash = new FlashData().danger("該当データがありません");
+			ra.addFlashAttribute("flash", flash);
+			return "redirect:/admin/orders";
+		}
+		return "admin/orderdetails/edit";
+	}
+
+	/*
+	 * 更新
+	 */
+	@PostMapping(value = "/edit/{id}")
+	public String update(@PathVariable Integer id, @Valid OrderDetail orderDetail, BindingResult result, Model model, RedirectAttributes ra) {
+		FlashData flash;
+		String url;
+		try {
+			if (result.hasErrors()) {
+				return "admin/orderdetails/edit";
+			}
+			OrderDetail detail = orderDetailService.findById(id);
+			Order order = detail.getOrder();
+			url = "redirect:/admin/orders/view/" + order.getId(); 
+			orderDetail.setOrder(order);
+			orderDetailService.save(orderDetail);
+			flash = new FlashData().success("更新しました");
+		} catch (Exception e) {
+			flash = new FlashData().danger("該当データがありません");
+			url = "redirect:/admin/orders"; 
+		}
+		ra.addFlashAttribute("flash", flash);
+		return url;
 	}
 }

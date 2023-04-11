@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,7 +33,7 @@ public class Product extends AbstractEntity {
 	private String name;
 
 	@Column(nullable = false)
-	@NotEmpty(message = "価格が未入力です")
+	@NotNull(message = "価格が未入力です")
 	@Min(value = 0, message = "価格は0以上の整数を入力してください")
 	private Integer price;
 }

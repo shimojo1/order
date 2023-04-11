@@ -30,13 +30,12 @@ public class OrderDetail extends AbstractEntity {
 	private Integer id;
 
 	@Column(nullable = false)
-	@NotNull(message = "価格が未入力です")
-	@Min(value = 0, message = "価格は0以上の整数を入力してください")
+	@NotNull(message = "数量が未入力です")
+	@Min(value = 0, message = "数量は0以上の整数を入力してください")
 	private Integer unit;
 
 	@ManyToOne
 	@JoinColumn(name = "order_id")
-	@NotNull(message = "受注は必須入力です")
 	private Order order;
 
 	@ManyToOne
